@@ -6,8 +6,8 @@ namespace PartySizeReunited.McMMenu
 {
     internal class McMWorkshopLimitSettings
     {
-        private static readonly string fixedBonusHint = "Adds a fixed bonus to the default workshop limit (default is clan tier + 1).";
-        private static readonly string isActivateHint = "Should workshop limit option be activated?";
+        private const string fixedBonusHint = "Adds a fixed bonus to the default workshop limit (default is clan tier + 1).";
+        private const string isActivateHint = "Workshop limit bonus.";
 
         public static ISettingsBuilder AddWorkshopLimitSettings(ISettingsBuilder builder, WorkshopLimitOptions opt)
         {
@@ -16,7 +16,7 @@ namespace PartySizeReunited.McMMenu
 
             void Build(ISettingsPropertyGroupBuilder groupBuilder)
                 => groupBuilder
-                .AddBool("psr_activate_workshop_limit", "Activate?",
+                .AddToggle("psr_activate_workshop_limit", "Enable workshop bonus",
                              new ProxyRef<bool>(() => opt.IsActivate, value => opt.IsActivate = value),
                              propBuilder => propBuilder
                              .SetRequireRestart(false)

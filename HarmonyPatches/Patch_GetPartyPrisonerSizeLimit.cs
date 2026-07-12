@@ -43,6 +43,11 @@ namespace PartySizeReunited.HarmonyPatches
                 return false;
             }
 
+            if (!options.IsPrisonerActivate)
+            {
+                return false;
+            }
+
             return options.BonusScope.SelectedValue.Scope switch
             {
                 IScope.Everyone => true,

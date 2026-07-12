@@ -45,6 +45,11 @@ namespace PartySizeReunited.HarmonyPatches
                 return false;
             }
 
+            if (!options.IsGarrisonActivate)
+            {
+                return false;
+            }
+
             return options.BonusScope.SelectedValue.Scope switch
             {
                 IScope.Everyone => true,

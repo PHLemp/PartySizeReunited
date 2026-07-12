@@ -16,6 +16,9 @@ namespace PartySizeReunited.HarmonyPatches.Wage
 
         public static void Postfix(MobileParty mobileParty, ref ExplainedNumber __result)
         {
+            if (!SubModule.PartySizeReunitedOptions.IsActivate || !SubModule.PartySizeReunitedOptions.IsWageActivate)
+                return;
+
             if (mobileParty.IsGarrison)
                 return;
 

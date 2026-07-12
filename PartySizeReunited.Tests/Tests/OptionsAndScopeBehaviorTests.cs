@@ -14,6 +14,10 @@ namespace PartySizeReunited.Tests.Tests
             var options = new PartySizeReunitedOptions();
 
             Assert.False(options.IsActivate);
+            Assert.True(options.IsWageActivate);
+            Assert.True(options.IsPrisonerActivate);
+            Assert.True(options.IsGarrisonActivate);
+            Assert.True(options.IsCaravanActivate);
             Assert.False(options.IsPlayerPartyImpacted);
             Assert.False(options.NoMoreSupplyIssues);
             Assert.Equal(1f, options.PartyBonusAmnt);
@@ -28,6 +32,16 @@ namespace PartySizeReunited.Tests.Tests
         {
             Assert.Equal("Static", new OptionType(OptionTypeEnum.Static).ToString());
             Assert.Equal("Progressive", new OptionType(OptionTypeEnum.Progressive).ToString());
+        }
+
+        [Fact]
+        public void WarSailsOptions_HaveExpectedDefaults()
+        {
+            var options = new WarSailsOptions();
+
+            Assert.True(options.IsActivate);
+            Assert.False(options.OnlyApplyToPlayer);
+            Assert.Equal(0, options.BonusBoats);
         }
 
         [Fact]

@@ -6,9 +6,9 @@ namespace PartySizeReunited.McMMenu
 {
     internal class McMPartyRecruitmentSettings
     {
-        private static readonly string partyTypeHint = "Progressive = Clan Tier + X + Perks, Static = X; Where X = Your Setting";
-        private static readonly string partyLimitHint = "Set the limit of how many parties you can create in your clan.\nWARNING! More you increase your limit, more kingdoms will want to declare wars against you!";
-        private static readonly string isActivateHint = "Should party limit option be activated?";
+        private const string partyTypeHint = "Progressive = Clan Tier + X + Perks, Static = X; Where X = Your Setting";
+        private const string partyLimitHint = "Set the limit of how many parties you can create in your clan.\nWARNING! More you increase your limit, more kingdoms will want to declare wars against you!";
+        private const string isActivateHint = "Party recruitment limits.";
 
         public static ISettingsBuilder AddPartyRecruitmentSettings(ISettingsBuilder builder, PartyRecruitmentOptions opt)
         {
@@ -17,7 +17,7 @@ namespace PartySizeReunited.McMMenu
 
             void Build(ISettingsPropertyGroupBuilder groupBuilder)
                 => groupBuilder
-                .AddBool("psr_activate_party_recruitment", "Activate?",
+                .AddToggle("psr_activate_party_recruitment", "Enable party limits",
                              new ProxyRef<bool>(() => opt.IsActivate, value => opt.IsActivate = value),
                              propBuilder => propBuilder
                              .SetRequireRestart(false)

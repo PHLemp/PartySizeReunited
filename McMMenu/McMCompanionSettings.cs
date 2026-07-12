@@ -6,9 +6,9 @@ namespace PartySizeReunited.McMMenu
 {
     internal class McMCompanionSettings
     {
-        private static readonly string companionTypeHint = "Progressive = Clan Tier + X + Perks, Static = X; Where X = Your Setting";
-        private static readonly string companionLimitHint = "Set the limit of how many companions you can recruit in your party.";
-        private static readonly string isActivateHint = "Should companions limit option be activated?";
+        private const string companionTypeHint = "Progressive = Clan Tier + X + Perks, Static = X; Where X = Your Setting";
+        private const string companionLimitHint = "Set the limit of how many companions you can recruit in your party.";
+        private const string isActivateHint = "Companion limit settings.";
 
         public static ISettingsBuilder AddCompanionsSettings(ISettingsBuilder builder, CompanionsOptions opt)
         {
@@ -17,7 +17,7 @@ namespace PartySizeReunited.McMMenu
 
             void BuildCompanions(ISettingsPropertyGroupBuilder builder)
                 => builder
-                .AddBool("psr_activate_companions", "Activate?",
+                .AddToggle("psr_activate_companions", "Enable companion limits",
                              new ProxyRef<bool>(() => opt.IsActivate, value => opt.IsActivate = value),
                              propBuilder => propBuilder
                              .SetRequireRestart(false)

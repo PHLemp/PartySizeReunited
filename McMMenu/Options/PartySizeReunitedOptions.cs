@@ -5,7 +5,11 @@ namespace PartySizeReunited.McMMenu.Options
 {
     public class PartySizeReunitedOptions
     {
-        public bool IsActivate { get; set; }
+        public bool IsActivate { get; set; } = true;
+        public bool IsWageActivate { get; set; }
+        public bool IsPrisonerActivate { get; set; }
+        public bool IsGarrisonActivate { get; set; }
+        public bool IsCaravanActivate { get; set; }
         public bool IsPlayerPartyImpacted { get; set; }
         public bool NoMoreSupplyIssues { get; set; }
         public float PartyBonusAmnt { get; set; } = 1f;

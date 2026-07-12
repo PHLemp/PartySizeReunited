@@ -4,8 +4,8 @@ namespace PartySizeReunited.McMMenu
 {
     internal static class McMSettings
     {
-        private static string SettingsId => "PartySizeReunited";
-        private static string DisplayedName => "Party Size Reunited";
+        private const string SettingsId = "PartySizeReunited";
+        private const string DisplayedName = "Party Size Reunited";
 
         public static ISettingsBuilder InitMcMSettings()
         {

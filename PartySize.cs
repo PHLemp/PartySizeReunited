@@ -104,6 +104,9 @@ namespace PartySizeReunited
 
         private ExplainedNumber HandleGarrisons(PartyBase party, ExplainedNumber result)
         {
+            if (!SubModule.PartySizeReunitedOptions.IsGarrisonActivate)
+                return result;
+
             if (!party.IsSettlement || party.Settlement == null)
                 return result;
 
@@ -124,6 +127,9 @@ namespace PartySizeReunited
 
         private ExplainedNumber HandleCaravans(PartyBase party, ExplainedNumber result)
         {
+            if (!SubModule.PartySizeReunitedOptions.IsCaravanActivate)
+                return result;
+
             if (!IsCaravan(party))
                 return result;
 

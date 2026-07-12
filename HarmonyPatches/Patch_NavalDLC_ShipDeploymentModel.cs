@@ -13,7 +13,7 @@ namespace PartySizeReunited.HarmonyPatches
             try
             {
                 // Chercher le type dans les assemblies chargés
-                Type targetType = AppDomain.CurrentDomain.GetAssemblies()
+                Type? targetType = AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(a => a.GetTypes())
                     .FirstOrDefault(t => t.Name == "NavalDLCShipDeploymentModel");
 
@@ -24,7 +24,7 @@ namespace PartySizeReunited.HarmonyPatches
                 }
 
                 // Obtenir la méthode à patcher
-                MethodInfo originalMethod = targetType.GetMethod("GetShipDeploymentLimit",
+                MethodInfo? originalMethod = targetType.GetMethod("GetShipDeploymentLimit",
                     BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
 
                 if (originalMethod == null)
@@ -34,7 +34,7 @@ namespace PartySizeReunited.HarmonyPatches
                 }
 
                 // Obtenir la méthode de patch
-                MethodInfo patchMethod = typeof(Patch_NavalDLC_ShipDeploymentModel).GetMethod(nameof(Postfix),
+                MethodInfo? patchMethod = typeof(Patch_NavalDLC_ShipDeploymentModel).GetMethod(nameof(Postfix),
                     BindingFlags.Public | BindingFlags.Static);
 
                 // Appliquer le patch en Postfix
@@ -50,15 +50,20 @@ namespace PartySizeReunited.HarmonyPatches
         {
             try
             {
+                if (!SubModule.WarSailsOptions.IsActivate)
+                {
+                    return;
+                }
+
                 // Accéder à party.LeaderHero.IsHumanPlayerCharacter via réflexion
                 Type partyType = party.GetType();
-                PropertyInfo leaderHeroProperty = partyType.GetProperty("LeaderHero");
+                PropertyInfo? leaderHeroProperty = partyType.GetProperty("LeaderHero");
                 object? leaderHero = leaderHeroProperty?.GetValue(party);
 
                 if (leaderHero != null)
                 {
                     Type heroType = leaderHero.GetType();
-                    PropertyInfo isHumanPlayerProperty = heroType.GetProperty("IsHumanPlayerCharacter");
+                    PropertyInfo? isHumanPlayerProperty = heroType.GetProperty("IsHumanPlayerCharacter");
                     bool isHumanPlayer = (bool)isHumanPlayerProperty.GetValue(leaderHero);
 
                     if (!isHumanPlayer && SubModule.WarSailsOptions.OnlyApplyToPlayer)
@@ -66,11 +71,9 @@ namespace PartySizeReunited.HarmonyPatches
                         // Ne rien changer, garder le résultat original
                         return;
                     }
-                    else
-                    {
-                        // Modifier le résultat
-                        __result += SubModule.WarSailsOptions.BonusBoats;
-                    }
+
+                    // Modifier le résultat
+                    __result += SubModule.WarSailsOptions.BonusBoats;
                 }
             }
             catch (Exception ex)
