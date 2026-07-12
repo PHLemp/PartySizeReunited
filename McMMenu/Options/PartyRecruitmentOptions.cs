@@ -7,8 +7,8 @@ namespace PartySizeReunited.McMMenu.Options
         public bool IsActivate { get; set; }
         public Dropdown<OptionType> Type { get; set; } = new Dropdown<OptionType>(new OptionType[]
         {
-            new (OptionTypeEnum.STATIC),
-            new (OptionTypeEnum.PROGRESSIVE)
+            new (OptionTypeEnum.Static),
+            new (OptionTypeEnum.Progressive)
         }, 0);
         public int Amount { get; set; }
     }

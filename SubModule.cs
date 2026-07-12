@@ -21,6 +21,7 @@ namespace PartySizeReunited
         public static readonly PartySizeReunitedOptions PartySizeReunitedOptions = new();
         public static readonly CompanionsOptions CompanionsOptions = new();
         public static readonly PartyRecruitmentOptions PartyRecruitmentOptions = new();
+        public static readonly WorkshopLimitOptions WorkshopLimitOptions = new();
 
         private static bool _isWarSailsModulePresent;
         private static Harmony? _harmony;
@@ -80,7 +81,7 @@ namespace PartySizeReunited
             ISettingsBuilder builder = McMSettings.InitMcMSettings();
             McMPartySizeReunitedSettings.AddPartySizeSettings(builder, PartySizeReunitedOptions);
             AddMoreSettings(builder);
-            AddPartyAndCompanionSettings(builder);
+            AddBonusSettings(builder);
             _settings = builder.BuildAsGlobal();
             _settings?.Register();
         }
@@ -100,10 +101,11 @@ namespace PartySizeReunited
             Utils.Print("PartySizeReunited configured for WarSails DLC");
         }
 
-        private static void AddPartyAndCompanionSettings(ISettingsBuilder builder)
+        private static void AddBonusSettings(ISettingsBuilder builder)
         {
             McMCompanionSettings.AddCompanionsSettings(builder, CompanionsOptions);
             McMPartyRecruitmentSettings.AddPartyRecruitmentSettings(builder, PartyRecruitmentOptions);
+            McMWorkshopLimitSettings.AddWorkshopLimitSettings(builder, WorkshopLimitOptions);
         }
     }
 }

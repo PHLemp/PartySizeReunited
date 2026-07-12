@@ -12,11 +12,11 @@ namespace PartySizeReunited.HarmonyPatches
         {
             if (SubModule.CompanionsOptions.IsActivate && clan.Leader.IsHumanPlayerCharacter)
             {
-                if (SubModule.CompanionsOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.STATIC)
+                if (SubModule.CompanionsOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.Static)
                 {
                     __result = SubModule.CompanionsOptions.Amount;
                 }
-                else if (SubModule.CompanionsOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.PROGRESSIVE)
+                else if (SubModule.CompanionsOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.Progressive)
                 {
                     __result += SubModule.CompanionsOptions.Amount;
                 }

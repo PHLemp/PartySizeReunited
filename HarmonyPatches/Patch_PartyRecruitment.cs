@@ -12,11 +12,11 @@ namespace PartySizeReunited.HarmonyPatches
         {
             if (SubModule.PartyRecruitmentOptions.IsActivate && clan == Clan.PlayerClan && clan.Leader.IsHumanPlayerCharacter)
             {
-                if (SubModule.PartyRecruitmentOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.STATIC)
+                if (SubModule.PartyRecruitmentOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.Static)
                 {
                     __result = SubModule.PartyRecruitmentOptions.Amount;
                 }
-                else if (SubModule.PartyRecruitmentOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.PROGRESSIVE)
+                else if (SubModule.PartyRecruitmentOptions.Type.SelectedValue.SelectedValue == OptionTypeEnum.Progressive)
                 {
                     __result = clanTierToCheck + SubModule.PartyRecruitmentOptions.Amount;
                 }

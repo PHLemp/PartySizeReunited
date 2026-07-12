@@ -15,8 +15,8 @@ namespace PartySizeReunited.McMMenu
             return builder
                 .CreateGroup("Party Limit", Build);
 
-            void Build(ISettingsPropertyGroupBuilder builder)
-                => builder
+            void Build(ISettingsPropertyGroupBuilder groupBuilder)
+                => groupBuilder
                 .AddBool("psr_activate_party_recruitment", "Activate?",
                              new ProxyRef<bool>(() => opt.IsActivate, value => opt.IsActivate = value),
                              propBuilder => propBuilder

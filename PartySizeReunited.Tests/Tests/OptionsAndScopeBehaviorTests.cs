@@ -26,8 +26,8 @@ namespace PartySizeReunited.Tests.Tests
         [Fact]
         public void OptionType_ToString_UsesDescriptionAttribute()
         {
-            Assert.Equal("Static", new OptionType(OptionTypeEnum.STATIC).ToString());
-            Assert.Equal("Progressive", new OptionType(OptionTypeEnum.PROGRESSIVE).ToString());
+            Assert.Equal("Static", new OptionType(OptionTypeEnum.Static).ToString());
+            Assert.Equal("Progressive", new OptionType(OptionTypeEnum.Progressive).ToString());
         }
 
         [Fact]

@@ -23,8 +23,8 @@ namespace PartySizeReunited.McMMenu.Options
     public enum OptionTypeEnum
     {
         [Description("Static")]
-        STATIC,
+        Static,
         [Description("Progressive")]
-        PROGRESSIVE
+        Progressive
     }
 }

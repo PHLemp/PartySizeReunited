@@ -2,7 +2,7 @@
 <Module>
   <Name value="PartySizeReunited"/>
   <Id value="PartySizeReunited"/>
-  <Version value="v2.0.2"/>
+  <Version value="v2.1.0"/>
 	<ModuleCategory value="Singleplayer"/>
 	<ModuleType value ="Community" />
   <DependedModules>
