@@ -89,7 +89,7 @@ namespace PartySizeReunited.HarmonyPatches.PartySpeed
             }
 
             PartySizeReunitedOptions options = SubModule.PartySizeReunitedOptions;
-            TextObject description = new("PartySizeReunited modifier");
+            TextObject description = new("Party Size Reunited modifier");
             if (options.PlayerPartySpeedFixedBonus != 0)
             {
                 __result.Add(

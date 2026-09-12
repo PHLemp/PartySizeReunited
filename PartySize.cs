@@ -1,5 +1,4 @@
-﻿using MCM.Common;
-using PartySizeReunited.Models;
+﻿using PartySizeReunited.Models;
 using PartySizeReunited.Services;
 using System;
 using System.Collections.Generic;
@@ -42,11 +41,9 @@ namespace PartySizeReunited
 
         private ExplainedNumber GetPartySizeUpdatedByPartySizeMod(PartyBase party, ExplainedNumber basePartySize)
         {
-            Dropdown<ScopeExtension> bonusScope = SubModule.PartySizeReunitedOptions.BonusScope;
-            IScope selectedScope = bonusScope.SelectedValue.Scope;
+            Scope selectedScope = SubModule.PartySizeReunitedOptions.BonusScope.SelectedValue.Scope;
             float bonusPercentage = SubModule.PartySizeReunitedOptions.PartyBonusAmnt;
             int fixedBonus = SubModule.PartySizeReunitedOptions.FixedBonusAmnt;
-            bool isPlayerImpacted = SubModule.PartySizeReunitedOptions.IsPlayerPartyImpacted;
 
             ExplainedNumber result = basePartySize;
             float newValue = fixedBonus != 0 ?
@@ -57,44 +54,11 @@ namespace PartySizeReunited
 
             if (!IsCaravan(party))
             {
-                switch (selectedScope)
+                if (ScopeExtension.IsInScope(selectedScope, party))
                 {
-                    case IScope.Everyone:
-                        if (ScopeExtension.IsEveryoneExceptPlayer(party))
-                        {
-                            result.Add(valueToApply, partySizeBonusText);
-                        }
-                        break;
-
-                    case IScope.Only_player_clan:
-                        if (ScopeExtension.IsOnlyPlayerClan(party))
-                        {
-                            result.Add(valueToApply, partySizeBonusText);
-                        }
-                        break;
-
-                    case IScope.Only_player_kingdom:
-                        if (ScopeExtension.IsOnlyPlayerKingdom(party))
-                        {
-                            result.Add(valueToApply, partySizeBonusText);
-                        }
-                        break;
-
-                    case IScope.Only_ennemies:
-                        if (ScopeExtension.IsOnlyEnnemies(party))
-                        {
-                            result.Add(valueToApply, partySizeBonusText);
-                        }
-                        break;
-                }
-
-                SetNoMoreSupplyNeeded(party);
-
-                if (isPlayerImpacted && party.Owner != null && party.Owner.IsHumanPlayerCharacter)
-                {
-                    // Update player's party
                     result.Add(valueToApply, partySizeBonusText);
                 }
+                SetNoMoreSupplyNeeded(party);
             }
             result = HandleCaravans(party, result);
             result = HandleGarrisons(party, result);
@@ -110,8 +74,8 @@ namespace PartySizeReunited
             if (!party.IsSettlement || party.Settlement == null)
                 return result;
 
-            float bonusPercentage = SubModule.PartySizeReunitedOptions.CaravanMultiBonus;
-            int fixedBonus = SubModule.PartySizeReunitedOptions.CaravanFixedBonus;
+            float bonusPercentage = SubModule.PartySizeReunitedOptions.PartyGarrisonMultiBonus;
+            int fixedBonus = SubModule.PartySizeReunitedOptions.PartyGarrisonFixedBonus;
 
             float newValue = fixedBonus != 0 ?
                 result.ResultNumber + fixedBonus : // If fixedBonus is set

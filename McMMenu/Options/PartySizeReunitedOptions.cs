@@ -33,11 +33,11 @@ namespace PartySizeReunited.McMMenu.Options
 
         public Dropdown<ScopeExtension> BonusScope { get; set; } = new Dropdown<ScopeExtension>(new ScopeExtension[]
         {
-            new (IScope.Everyone),
-            new (IScope.Only_player),
-            new (IScope.Only_player_clan),
-            new (IScope.Only_player_kingdom),
-            new (IScope.Only_ennemies)
+            new (Scope.Everyone),
+            new (Scope.OnlyPlayer),
+            new (Scope.OnlyPlayerClan),
+            new (Scope.OnlyPlayerKingdom),
+            new (Scope.OnlyEnnemies)
         }, 0);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using MCM.Common;
 using PartySizeReunited.Models;
 using System;
 using TaleWorlds.CampaignSystem;
@@ -22,52 +21,17 @@ namespace PartySizeReunited.HarmonyPatches.Wage
             if (mobileParty.IsGarrison)
                 return;
 
-            Dropdown<ScopeExtension> bonusScope = SubModule.PartySizeReunitedOptions.BonusScope;
-            IScope selectedScope = bonusScope.SelectedValue.Scope;
+            Scope selectedScope = SubModule.PartySizeReunitedOptions.BonusScope.SelectedValue.Scope;
             float bonusPercentage = SubModule.PartySizeReunitedOptions.PartyWageMultiBonus;
             int fixedBonus = SubModule.PartySizeReunitedOptions.PartyWageFixedBonus;
-            bool isPlayerImpacted = SubModule.PartySizeReunitedOptions.IsPlayerPartyImpacted;
-
             float newValue = fixedBonus != 0 ?
                 __result.ResultNumber + fixedBonus : // If fixedBonus is set
                 (float)Math.Round(__result.ResultNumber * bonusPercentage); // If not, we take the multiplicator
 
             float valueToApply = newValue - __result.ResultNumber;
 
-            switch (selectedScope)
+            if (ScopeExtension.IsInScope(selectedScope, mobileParty))
             {
-                case IScope.Everyone:
-                    if (ScopeExtension.IsEveryoneExceptPlayer(mobileParty))
-                    {
-                        __result.Add(valueToApply, partySizeBonusText);
-                    }
-                    break;
-
-                case IScope.Only_player_clan:
-                    if (ScopeExtension.IsOnlyPlayerClan(mobileParty))
-                    {
-                        __result.Add(valueToApply, partySizeBonusText);
-                    }
-                    break;
-
-                case IScope.Only_player_kingdom:
-                    if (ScopeExtension.IsOnlyPlayerKingdom(mobileParty))
-                    {
-                        __result.Add(valueToApply, partySizeBonusText);
-                    }
-                    break;
-
-                case IScope.Only_ennemies:
-                    if (ScopeExtension.IsOnlyEnnemies(mobileParty))
-                    {
-                        __result.Add(valueToApply, partySizeBonusText);
-                    }
-                    break;
-            }
-
-            if (isPlayerImpacted && mobileParty.LeaderHero?.IsHumanPlayerCharacter == true)
-            {
-                // Update player's party
                 __result.Add(valueToApply, partySizeBonusText);
             }
         }

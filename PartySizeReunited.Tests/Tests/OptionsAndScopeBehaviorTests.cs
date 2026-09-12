@@ -13,18 +13,18 @@ namespace PartySizeReunited.Tests.Tests
         {
             var options = new PartySizeReunitedOptions();
 
-            Assert.False(options.IsActivate);
-            Assert.True(options.IsWageActivate);
-            Assert.True(options.IsPrisonerActivate);
-            Assert.True(options.IsGarrisonActivate);
-            Assert.True(options.IsCaravanActivate);
+            Assert.True(options.IsActivate);
+            Assert.False(options.IsWageActivate);
+            Assert.False(options.IsPrisonerActivate);
+            Assert.False(options.IsGarrisonActivate);
+            Assert.False(options.IsCaravanActivate);
             Assert.False(options.IsPlayerPartyImpacted);
             Assert.False(options.NoMoreSupplyIssues);
             Assert.Equal(1f, options.PartyBonusAmnt);
             Assert.Equal(1f, options.PartyInfluenceCost);
             Assert.Equal(0, options.FixedBonusAmnt);
             Assert.Equal(0, options.BonusScope.SelectedIndex);
-            Assert.Equal(IScope.Everyone, options.BonusScope.SelectedValue.Scope);
+            Assert.Equal(Scope.Everyone, options.BonusScope.SelectedValue.Scope);
         }
 
         [Fact]
@@ -39,7 +39,7 @@ namespace PartySizeReunited.Tests.Tests
         {
             var options = new WarSailsOptions();
 
-            Assert.True(options.IsActivate);
+            Assert.False(options.IsActivate);
             Assert.False(options.OnlyApplyToPlayer);
             Assert.Equal(0, options.BonusBoats);
         }
@@ -47,8 +47,8 @@ namespace PartySizeReunited.Tests.Tests
         [Fact]
         public void ScopeExtension_ToString_UsesDescriptionAttribute()
         {
-            Assert.Equal("Everyone (Except player)", new ScopeExtension(IScope.Everyone).ToString());
-            Assert.Equal("Only enemies", new ScopeExtension(IScope.Only_ennemies).ToString());
+            Assert.Equal("Everyone (Except player)", new ScopeExtension(Scope.Everyone).ToString());
+            Assert.Equal("Only enemies", new ScopeExtension(Scope.OnlyEnnemies).ToString());
         }
 
         [Fact]
@@ -56,7 +56,13 @@ namespace PartySizeReunited.Tests.Tests
         {
             var playerKingdom = new Kingdom { Name = "Vlandia" };
             var playerClan = new Clan { Kingdom = playerKingdom };
+            var previousOptions = SubModule.PartySizeReunitedOptions;
+            var previousMainHero = Hero.MainHero;
             Hero.MainHero = new Hero { Clan = playerClan };
+            SubModule.PartySizeReunitedOptions = new PartySizeReunitedOptions
+            {
+                IsPlayerPartyImpacted = true
+            };
 
             var playerParty = new PartyBase
             {
@@ -72,10 +78,18 @@ namespace PartySizeReunited.Tests.Tests
                 }
             };
 
-            Assert.True(ScopeExtension.IsOnlyPlayer(playerParty));
-            Assert.False(ScopeExtension.IsOnlyEnnemies(playerParty));
-            Assert.True(ScopeExtension.IsOnlyEnnemies(enemyParty));
-            Assert.True(ScopeExtension.IsEveryoneExceptPlayer(enemyParty));
+            try
+            {
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayer, playerParty));
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, playerParty));
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, enemyParty));
+                Assert.True(ScopeExtension.IsInScope(Scope.Everyone, enemyParty));
+            }
+            finally
+            {
+                SubModule.PartySizeReunitedOptions = previousOptions;
+                Hero.MainHero = previousMainHero;
+            }
         }
 
         [Fact]
@@ -83,7 +97,13 @@ namespace PartySizeReunited.Tests.Tests
         {
             var playerKingdom = new Kingdom { Name = "Vlandia" };
             var playerClan = new Clan { Kingdom = playerKingdom };
+            var previousOptions = SubModule.PartySizeReunitedOptions;
+            var previousMainHero = Hero.MainHero;
             Hero.MainHero = new Hero { Clan = playerClan };
+            SubModule.PartySizeReunitedOptions = new PartySizeReunitedOptions
+            {
+                IsPlayerPartyImpacted = true
+            };
 
             var playerMobile = new MobileParty { IsMainParty = true, ActualClan = playerClan };
             var enemyMobile = new MobileParty
@@ -92,10 +112,18 @@ namespace PartySizeReunited.Tests.Tests
                 ActualClan = new Clan { Kingdom = new Kingdom { Name = "Khuzait" } }
             };
 
-            Assert.True(ScopeExtension.IsOnlyPlayer(playerMobile));
-            Assert.False(ScopeExtension.IsOnlyEnnemies(playerMobile));
-            Assert.True(ScopeExtension.IsOnlyEnnemies(enemyMobile));
-            Assert.True(ScopeExtension.IsEveryoneExceptPlayer(enemyMobile));
+            try
+            {
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayer, playerMobile));
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, playerMobile));
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, enemyMobile));
+                Assert.True(ScopeExtension.IsInScope(Scope.Everyone, enemyMobile));
+            }
+            finally
+            {
+                SubModule.PartySizeReunitedOptions = previousOptions;
+                Hero.MainHero = previousMainHero;
+            }
         }
     }
 }

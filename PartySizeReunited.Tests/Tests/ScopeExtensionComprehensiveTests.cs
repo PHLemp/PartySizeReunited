@@ -1,6 +1,7 @@
 using PartySizeReunited.Models;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 using Xunit;
 
 namespace PartySizeReunited.Tests.Tests
@@ -13,10 +14,25 @@ namespace PartySizeReunited.Tests.Tests
             var playerClan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } };
             var playerParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = true, Clan = playerClan } };
             var aiParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = false, Clan = playerClan } };
+            var previousOptions = SubModule.PartySizeReunitedOptions;
 
-            Assert.True(ScopeExtension.IsOnlyPlayer(playerParty));
-            Assert.False(ScopeExtension.IsOnlyPlayer(aiParty));
-            Assert.False(ScopeExtension.IsOnlyPlayer((PartyBase)null!));
+            try
+            {
+                SubModule.PartySizeReunitedOptions = new McMMenu.Options.PartySizeReunitedOptions
+                {
+                    IsPlayerPartyImpacted = false
+                };
+                Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, playerParty));
+
+                SubModule.PartySizeReunitedOptions.IsPlayerPartyImpacted = true;
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayer, playerParty));
+                Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, aiParty));
+                Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, (PartyBase)null!));
+            }
+            finally
+            {
+                SubModule.PartySizeReunitedOptions = previousOptions;
+            }
         }
 
         [Fact]
@@ -25,9 +41,9 @@ namespace PartySizeReunited.Tests.Tests
             var playerParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = true } };
             var aiParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = false } };
 
-            Assert.False(ScopeExtension.IsEveryoneExceptPlayer(playerParty));
-            Assert.True(ScopeExtension.IsEveryoneExceptPlayer(aiParty));
-            Assert.True(ScopeExtension.IsEveryoneExceptPlayer((PartyBase)null!));
+            Assert.False(ScopeExtension.IsInScope(Scope.Everyone, playerParty));
+            Assert.True(ScopeExtension.IsInScope(Scope.Everyone, aiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.Everyone, (PartyBase)null!));
         }
 
         [Fact]
@@ -43,10 +59,10 @@ namespace PartySizeReunited.Tests.Tests
             };
             var playerParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = true, Clan = playerClan } };
 
-            Assert.True(ScopeExtension.IsOnlyPlayerClan(sameClanAiParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan(differentClanAiParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan(playerParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan((PartyBase)null!));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, sameClanAiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, differentClanAiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, playerParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, (PartyBase)null!));
         }
 
         [Fact]
@@ -65,9 +81,9 @@ namespace PartySizeReunited.Tests.Tests
                 Owner = new Hero { IsHumanPlayerCharacter = false, Clan = new Clan { Kingdom = new Kingdom { Name = "Aserai" } } }
             };
 
-            Assert.True(ScopeExtension.IsOnlyPlayerKingdom(sameKingdomAiParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom(differentKingdomAiParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom((PartyBase)null!));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, sameKingdomAiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, differentKingdomAiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, (PartyBase)null!));
         }
 
         [Fact]
@@ -88,37 +104,46 @@ namespace PartySizeReunited.Tests.Tests
             };
             var playerParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = true, Clan = playerClan } };
 
-            Assert.True(ScopeExtension.IsOnlyEnnemies(sameClanAiParty));
-            Assert.True(ScopeExtension.IsOnlyEnnemies(sameKingdomDifferentClanAiParty));
-            Assert.True(ScopeExtension.IsOnlyEnnemies(differentKingdomAiParty));
-            Assert.False(ScopeExtension.IsOnlyEnnemies(playerParty));
-            Assert.True(ScopeExtension.IsOnlyEnnemies((PartyBase)null!));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, sameClanAiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, sameKingdomDifferentClanAiParty));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, differentKingdomAiParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, playerParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, (PartyBase)null!));
         }
 
-        [Fact]
-        public void Clan_And_Kingdom_Overloads_ReturnExpectedValues()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void PlayerOwnedEntities_AreIncludedInEveryScopeOnlyWhenPlayerImpactIsEnabled(bool isPlayerPartyImpacted)
         {
             var playerKingdom = new Kingdom { Name = "Vlandia" };
             var playerClan = new Clan { Kingdom = playerKingdom };
-            Hero.MainHero = new Hero { Clan = playerClan };
+            var previousOptions = SubModule.PartySizeReunitedOptions;
+            var previousMainHero = Hero.MainHero;
+            Hero.MainHero = new Hero { IsHumanPlayerCharacter = true, Clan = playerClan };
+            SubModule.PartySizeReunitedOptions = new McMMenu.Options.PartySizeReunitedOptions
+            {
+                IsPlayerPartyImpacted = isPlayerPartyImpacted
+            };
 
-            var sameClan = playerClan;
-            var otherClan = new Clan { Kingdom = playerKingdom };
-            var sameKingdom = playerKingdom;
-            var sameNameDifferentInstanceKingdom = new Kingdom { Name = "Vlandia" };
-            var otherKingdom = new Kingdom { Name = "Aserai" };
+            try
+            {
+                var playerParty = new PartyBase { Owner = new Hero { IsHumanPlayerCharacter = true, Clan = playerClan } };
+                var playerMobileParty = new MobileParty { IsMainParty = true, ActualClan = playerClan };
+                var playerSettlement = new Settlement { Owner = new Hero { IsHumanPlayerCharacter = true, Clan = playerClan } };
 
-            Assert.True(ScopeExtension.IsOnlyPlayerClan(sameClan));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan(otherClan));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan((Clan)null!));
-
-            Assert.True(ScopeExtension.IsOnlyPlayerKingdom(sameKingdom));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom(sameNameDifferentInstanceKingdom));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom((Kingdom)null!));
-
-            Assert.True(ScopeExtension.IsOnlyEnnemies(otherKingdom));
-            Assert.False(ScopeExtension.IsOnlyEnnemies(sameNameDifferentInstanceKingdom));
-            Assert.False(ScopeExtension.IsOnlyEnnemies((Kingdom)null!));
+                foreach (Scope scope in Enum.GetValues<Scope>())
+                {
+                    Assert.Equal(isPlayerPartyImpacted, ScopeExtension.IsInScope(scope, playerParty));
+                    Assert.Equal(isPlayerPartyImpacted, ScopeExtension.IsInScope(scope, playerMobileParty));
+                    Assert.Equal(isPlayerPartyImpacted, ScopeExtension.IsInScope(scope, playerSettlement));
+                }
+            }
+            finally
+            {
+                SubModule.PartySizeReunitedOptions = previousOptions;
+                Hero.MainHero = previousMainHero;
+            }
         }
 
         [Fact]
@@ -126,14 +151,27 @@ namespace PartySizeReunited.Tests.Tests
         {
             var mainParty = new MobileParty { IsMainParty = true };
             var aiParty = new MobileParty { IsMainParty = false };
+            var previousOptions = SubModule.PartySizeReunitedOptions;
 
-            Assert.True(ScopeExtension.IsOnlyPlayer(mainParty));
-            Assert.False(ScopeExtension.IsOnlyPlayer(aiParty));
-            Assert.False(ScopeExtension.IsOnlyPlayer((MobileParty)null!));
+            try
+            {
+                SubModule.PartySizeReunitedOptions = new McMMenu.Options.PartySizeReunitedOptions();
+                Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, mainParty));
+                Assert.False(ScopeExtension.IsInScope(Scope.Everyone, mainParty));
 
-            Assert.False(ScopeExtension.IsEveryoneExceptPlayer(mainParty));
-            Assert.True(ScopeExtension.IsEveryoneExceptPlayer(aiParty));
-            Assert.True(ScopeExtension.IsEveryoneExceptPlayer((MobileParty)null!));
+                SubModule.PartySizeReunitedOptions.IsPlayerPartyImpacted = true;
+                Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayer, mainParty));
+                Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, aiParty));
+                Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, (MobileParty)null!));
+
+                Assert.True(ScopeExtension.IsInScope(Scope.Everyone, mainParty));
+                Assert.True(ScopeExtension.IsInScope(Scope.Everyone, aiParty));
+                Assert.False(ScopeExtension.IsInScope(Scope.Everyone, (MobileParty)null!));
+            }
+            finally
+            {
+                SubModule.PartySizeReunitedOptions = previousOptions;
+            }
         }
 
         [Fact]
@@ -155,14 +193,14 @@ namespace PartySizeReunited.Tests.Tests
                 ActualClan = new Clan { Kingdom = new Kingdom { Name = "Aserai" } }
             };
 
-            Assert.True(ScopeExtension.IsOnlyPlayerClan(sameClanParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan(sameKingdomDifferentClanParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerClan((MobileParty)null!));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, sameClanParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, sameKingdomDifferentClanParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, (MobileParty)null!));
 
-            Assert.True(ScopeExtension.IsOnlyPlayerKingdom(sameClanParty));
-            Assert.True(ScopeExtension.IsOnlyPlayerKingdom(sameKingdomDifferentClanParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom(differentKingdomParty));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom((MobileParty)null!));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, sameClanParty));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, sameKingdomDifferentClanParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, differentKingdomParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, (MobileParty)null!));
         }
 
         [Fact]
@@ -185,24 +223,119 @@ namespace PartySizeReunited.Tests.Tests
                 ActualClan = new Clan { Kingdom = new Kingdom { Name = "Aserai" } }
             };
 
-            Assert.False(ScopeExtension.IsOnlyEnnemies(mainParty));
-            Assert.True(ScopeExtension.IsOnlyEnnemies(nullKingdomParty));
-            Assert.False(ScopeExtension.IsOnlyEnnemies(sameKingdomParty));
-            Assert.True(ScopeExtension.IsOnlyEnnemies(differentKingdomParty));
-            Assert.False(ScopeExtension.IsOnlyEnnemies((MobileParty)null!));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, mainParty));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, nullKingdomParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, sameKingdomParty));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, differentKingdomParty));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, (MobileParty)null!));
         }
 
         [Fact]
-        public void KingdomAndClanMethods_ReturnFalse_WhenMainHeroMissing()
+        public void IsInScope_DispatchesEveryScope_AndRejectsUnknownScope()
         {
-            Hero.MainHero = null;
+            var playerKingdom = new Kingdom { Name = "Vlandia" };
+            var playerClan = new Clan { Kingdom = playerKingdom };
+            Hero.MainHero = new Hero { Clan = playerClan };
+            var party = new PartyBase
+            {
+                Owner = new Hero { Clan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } } }
+            };
 
-            var clan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } };
-            var kingdom = new Kingdom { Name = "Aserai" };
+            Assert.True(ScopeExtension.IsInScope(Scope.Everyone, party));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayer, party));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyPlayerClan, party));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, party));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, party));
+            Assert.False(ScopeExtension.IsInScope((Scope)int.MaxValue, party));
+        }
 
-            Assert.False(ScopeExtension.IsOnlyPlayerClan(clan));
-            Assert.False(ScopeExtension.IsOnlyPlayerKingdom(kingdom));
-            Assert.False(ScopeExtension.IsOnlyEnnemies(kingdom));
+        [Fact]
+        public void IsInScope_RejectsUnknownScope_ForIncludedPlayer()
+        {
+            var previousOptions = SubModule.PartySizeReunitedOptions;
+            SubModule.PartySizeReunitedOptions = new McMMenu.Options.PartySizeReunitedOptions
+            {
+                IsPlayerPartyImpacted = true
+            };
+
+            try
+            {
+                var playerParty = new PartyBase
+                {
+                    Owner = new Hero { IsHumanPlayerCharacter = true }
+                };
+
+                Assert.False(ScopeExtension.IsInScope((Scope)int.MaxValue, playerParty));
+            }
+            finally
+            {
+                SubModule.PartySizeReunitedOptions = previousOptions;
+            }
+        }
+
+        [Fact]
+        public void EntitiesWithoutKingdom_PreserveTheirExistingEnemyBehavior()
+        {
+            Hero.MainHero = new Hero { Clan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } } };
+            var party = new PartyBase { Owner = new Hero { Clan = new Clan { Kingdom = null } } };
+            var mobileParty = new MobileParty { ActualClan = new Clan { Kingdom = null } };
+            var settlement = new Settlement { Owner = new Hero { Clan = new Clan { Kingdom = null } } };
+
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, party));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, mobileParty));
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyEnnemies, settlement));
+        }
+
+        [Fact]
+        public void PlayerWithoutKingdom_UsesSameEnemyRuleForEveryEntityType()
+        {
+            var playerClan = new Clan { Kingdom = null };
+            var otherClan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } };
+            var otherIndependentClan = new Clan { Kingdom = null };
+            Hero.MainHero = new Hero { Clan = playerClan };
+
+            Assert.True(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new PartyBase { Owner = new Hero { Clan = otherClan } }));
+            Assert.True(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new MobileParty { ActualClan = otherClan }));
+            Assert.True(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new Settlement { Owner = new Hero { Clan = otherClan } }));
+
+            Assert.True(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new PartyBase { Owner = new Hero { Clan = otherIndependentClan } }));
+            Assert.True(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new MobileParty { ActualClan = otherIndependentClan }));
+            Assert.True(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new Settlement { Owner = new Hero { Clan = otherIndependentClan } }));
+
+            Assert.False(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new PartyBase { Owner = new Hero { Clan = playerClan } }));
+            Assert.False(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new MobileParty { ActualClan = playerClan }));
+            Assert.False(ScopeExtension.IsInScope(
+                Scope.OnlyEnnemies,
+                new Settlement { Owner = new Hero { Clan = playerClan } }));
+        }
+
+        [Fact]
+        public void Settlement_KingdomScopes_CompareKingdomsByName()
+        {
+            Hero.MainHero = new Hero { Clan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } } };
+            var settlement = new Settlement
+            {
+                Owner = new Hero { Clan = new Clan { Kingdom = new Kingdom { Name = "Vlandia" } } }
+            };
+
+            Assert.True(ScopeExtension.IsInScope(Scope.OnlyPlayerKingdom, settlement));
+            Assert.False(ScopeExtension.IsInScope(Scope.OnlyEnnemies, settlement));
         }
     }
 }

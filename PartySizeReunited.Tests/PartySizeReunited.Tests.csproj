@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\PartySize.cs" Link="PartySize.cs" />
     <Compile Include="..\Models\ScopeExtension.cs" Link="Models\ScopeExtension.cs" />
     <Compile Include="..\McMMenu\Options\OptionTypeEnum.cs" Link="McMMenu\Options\OptionTypeEnum.cs" />
     <Compile Include="..\McMMenu\Options\PartySizeReunitedOptions.cs" Link="McMMenu\Options\PartySizeReunitedOptions.cs" />

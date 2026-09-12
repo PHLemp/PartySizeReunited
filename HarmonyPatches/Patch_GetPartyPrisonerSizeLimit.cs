@@ -8,7 +8,7 @@ using TaleWorlds.Localization;
 namespace PartySizeReunited.HarmonyPatches
 {
     /// <summary>
-    /// This patch try to add a custom party size mutliplier after the execution of "GetPartyPrisonerSizeLimit" that will define the default party size limit of a garrison.
+    /// This patch try to add a custom party size mutliplier after the execution of "GetPartyPrisonerSizeLimit" that will define the default prisoner party size limit.
     /// </summary>
     [HarmonyPatch(typeof(DefaultPartySizeLimitModel), nameof(DefaultPartySizeLimitModel.GetPartyPrisonerSizeLimit))]
     class GetPartyPrisonerSizeLimit
@@ -18,18 +18,18 @@ namespace PartySizeReunited.HarmonyPatches
             if (!ShouldApplyPatch(party)) return;
             
             var options = SubModule.PartySizeReunitedOptions;
-            TextObject description = new("PartySizeReunited modifier");
-            if (options.PartyGarrisonFixedBonus != 0)
+            TextObject description = new("Party Size Reunited modifier");
+            if (options.PartyPrisonerFixedBonus != 0)
             {
                 __result.Add(
-                    options.PartyGarrisonFixedBonus,
+                    options.PartyPrisonerFixedBonus,
                     description
                 );
             }
             else
             {
                 __result.AddFactor(
-                    options.PartyGarrisonMultiBonus,
+                    options.PartyPrisonerMultiBonus,
                     description
                 );
             }
@@ -48,15 +48,7 @@ namespace PartySizeReunited.HarmonyPatches
                 return false;
             }
 
-            return options.BonusScope.SelectedValue.Scope switch
-            {
-                IScope.Everyone => true,
-                IScope.Only_player => options.IsPlayerPartyImpacted && party.Owner != null && party.Owner.IsHumanPlayerCharacter,
-                IScope.Only_player_clan => ScopeExtension.IsOnlyPlayerClan(party),
-                IScope.Only_player_kingdom => ScopeExtension.IsOnlyPlayerKingdom(party),
-                IScope.Only_ennemies => ScopeExtension.IsOnlyEnnemies(party),
-                _ => false
-            };
+            return ScopeExtension.IsInScope(options.BonusScope.SelectedValue.Scope, party);
         }
     }
 }

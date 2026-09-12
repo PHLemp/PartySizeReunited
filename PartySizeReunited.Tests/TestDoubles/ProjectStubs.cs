@@ -1,14 +1,10 @@
 using PartySizeReunited.McMMenu.Options;
-using TaleWorlds.CampaignSystem.GameComponents;
-
 namespace PartySizeReunited
 {
-    public class PartySize : DefaultPartySizeLimitModel
-    {
-    }
 
     public static class SubModule
     {
+        public static PartySizeReunitedOptions PartySizeReunitedOptions { get; set; } = new PartySizeReunitedOptions();
         public static WarSailsOptions WarSailsOptions { get; set; } = new WarSailsOptions();
     }
 }

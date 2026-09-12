@@ -1,9 +1,3 @@
-namespace TaleWorlds.CampaignSystem.GameComponents
-{
-    public class DefaultPartySizeLimitModel
-    {
-    }
-}
 
 namespace StoryMode.GameComponents
 {

@@ -1,34 +1,31 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Module>
-  <Name value="PartySizeReunited"/>
-  <Id value="PartySizeReunited"/>
-  <Version value="v2.1.1"/>
-	<ModuleCategory value="Singleplayer"/>
-	<ModuleType value ="Community" />
+  <Name value="PartySizeReunited" />
+  <Id value="PartySizeReunited" />
+  <Version value="v2.2.0" />
+  <ModuleCategory value="Singleplayer" />
+  <ModuleType value="Community" />
   <DependedModules>
     <DependedModule Id="Native" DependentVersion="v1.0.0" />
     <DependedModule Id="SandBoxCore" DependentVersion="v1.0.0" />
-		<DependedModule Id="Sandbox" DependentVersion="v1.0.0" />
-    <DependedModule Id="CustomBattle" DependentVersion="v1.0.0"/>
+    <DependedModule Id="Sandbox" DependentVersion="v1.0.0" />
+    <DependedModule Id="CustomBattle" DependentVersion="v1.0.0" />
     <DependedModule Id="StoryMode" DependentVersion="v1.0.0" />
-		<DependedModule Id="Bannerlord.MBOptionScreen"/>
+    <DependedModule Id="Bannerlord.Harmony" />
+    <DependedModule Id="Bannerlord.ButterLib" />
+    <DependedModule Id="Bannerlord.UIExtenderEx" />
+    <DependedModule Id="Bannerlord.MBOptionScreen" />
   </DependedModules>
   <SubModules>
-		<SubModule>
-			<Name value="MCMv5" />
-			<DLLName value="MCMv5.dll" />
-			<SubModuleClassType value="MCM.MCMSubModule" />
-			<Tags />
-		</SubModule>
     <SubModule>
-      <Name value="PartySizeReunited"/>
-      <DLLName value="PartySizeReunited.dll"/>
-      <SubModuleClassType value="PartySizeReunited.SubModule"/>
+      <Name value="PartySizeReunited" />
+      <DLLName value="PartySizeReunited.dll" />
+      <SubModuleClassType value="PartySizeReunited.SubModule" />
       <Tags>
         <Tag key="DedicatedServerType" value="none" />
         <Tag key="IsNoRenderModeElement" value="false" />
       </Tags>
     </SubModule>
   </SubModules>
-	<Xmls/>
+  <Xmls />
 </Module>

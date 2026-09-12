@@ -19,7 +19,7 @@ namespace PartySizeReunited.HarmonyPatches
             if (ShouldApplyPatch(settlement))
             {
                 var options = SubModule.PartySizeReunitedOptions;
-                TextObject description = new("PartySizeReunited modifier");
+                TextObject description = new("Party Size Reunited modifier");
                 if (options.PartyGarrisonFixedBonus != 0)
                 {
                     __result.Add(
@@ -50,15 +50,7 @@ namespace PartySizeReunited.HarmonyPatches
                 return false;
             }
 
-            return options.BonusScope.SelectedValue.Scope switch
-            {
-                IScope.Everyone => true,
-                IScope.Only_player => options.IsPlayerPartyImpacted && settlement.Owner != null && settlement.Owner.IsHumanPlayerCharacter,
-                IScope.Only_player_clan => ScopeExtension.IsOnlyPlayerClan(settlement.OwnerClan),
-                IScope.Only_player_kingdom => ScopeExtension.IsOnlyPlayerKingdom(settlement.OwnerClan.Kingdom),
-                IScope.Only_ennemies => ScopeExtension.IsOnlyEnnemies(settlement.OwnerClan.Kingdom),
-                _ => false,
-            };
+            return ScopeExtension.IsInScope(options.BonusScope.SelectedValue.Scope, settlement);
         }
     }
 }

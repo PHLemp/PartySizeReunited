@@ -1,15 +1,17 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Reflection;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.Party;
+using TaleWorlds.CampaignSystem.Settlements;
 
 namespace PartySizeReunited.Models
 {
     public class ScopeExtension
     {
-        public IScope Scope { get; }
+        public Scope Scope { get; }
 
-        public ScopeExtension(IScope scope)
+        public ScopeExtension(Scope scope)
         {
             Scope = scope;
         }
@@ -21,118 +23,78 @@ namespace PartySizeReunited.Models
             return attribute?.Description ?? Scope.ToString();
         }
 
-        public static bool IsEveryoneExceptPlayer(PartyBase party)
+        public static bool IsInScope(Scope scope, PartyBase? party)
         {
-            return !IsOnlyPlayer(party);
+            return party != null && Matches(
+                scope,
+                party.Owner?.IsHumanPlayerCharacter == true,
+                party.Owner?.Clan);
         }
 
-        public static bool IsOnlyPlayer(PartyBase party)
+        public static bool IsInScope(Scope scope, MobileParty? party)
         {
-            return party?.Owner != null && party.Owner.IsHumanPlayerCharacter == true;
+            return party != null && Matches(
+                scope,
+                party.IsMainParty,
+                party.ActualClan);
         }
 
-        public static bool IsOnlyEnnemies(PartyBase party)
+        public static bool IsInScope(Scope scope, Settlement? settlement)
         {
-            return party?.Owner == null ||
-                !party.Owner.IsHumanPlayerCharacter ||
-                party.Owner.Clan == null ||
-                party.Owner.Clan?.Kingdom == null ||
-                (Hero.MainHero?.Clan?.Kingdom != null && party.Owner.Clan.Kingdom.Name != Hero.MainHero.Clan.Kingdom.Name) ||
-                (Hero.MainHero?.Clan != null && party.Owner.Clan != Hero.MainHero?.Clan);
+            return settlement != null && Matches(
+                scope,
+                settlement.Owner?.IsHumanPlayerCharacter == true,
+                settlement.Owner?.Clan);
         }
 
-        public static bool IsOnlyEnnemies(Kingdom kingdom)
+        private static bool Matches(
+            Scope scope,
+            bool isPlayer,
+            Clan? entityClan)
         {
-            return kingdom != null &&
-                        Hero.MainHero?.Clan?.Kingdom != null &&
-                        kingdom.Name != Hero.MainHero.Clan.Kingdom.Name;
+            bool includePlayer = SubModule.PartySizeReunitedOptions.IsPlayerPartyImpacted;
+            var playerClan = Hero.MainHero?.Clan;
+            var playerKingdom = playerClan?.Kingdom;
+            var entityKingdom = entityClan?.Kingdom;
+            bool isPlayerClan = entityClan != null && playerClan != null && entityClan == playerClan;
+            bool isPlayerKingdom = HaveSameKingdomName(entityKingdom, playerKingdom);
+            bool isEnemy = !isPlayerClan && !isPlayerKingdom;
+
+            return scope switch
+            {
+                Scope.Everyone => !isPlayer || includePlayer,
+                Scope.OnlyPlayer => isPlayer && includePlayer,
+                Scope.OnlyPlayerClan => isPlayer ? includePlayer : isPlayerClan,
+                Scope.OnlyPlayerKingdom => isPlayer ? includePlayer : isPlayerKingdom,
+                Scope.OnlyEnnemies => isPlayer ? includePlayer : isEnemy,
+                _ => false
+            };
         }
 
-        public static bool IsOnlyPlayerClan(PartyBase party)
+        private static bool HaveSameKingdomName(Kingdom? first, Kingdom? second)
         {
-            return party?.Owner != null &&
-                !party.Owner.IsHumanPlayerCharacter &&
-                        party.Owner.Clan != null &&
-                        Hero.MainHero?.Clan != null &&
-                        party.Owner.Clan == Hero.MainHero.Clan;
+            return first != null &&
+                   second != null &&
+                   string.Equals(first.Name?.ToString(), second.Name?.ToString(), StringComparison.Ordinal);
         }
 
-        public static bool IsOnlyPlayerClan(Clan clan)
-        {
-            return clan != null &&
-                        Hero.MainHero?.Clan != null &&
-                        clan == Hero.MainHero?.Clan;
-        }
-
-        public static bool IsOnlyPlayerKingdom(PartyBase party)
-        {
-            return party?.Owner != null &&
-                !party.Owner.IsHumanPlayerCharacter &&
-                        party.Owner.Clan?.Kingdom != null &&
-                        Hero.MainHero?.Clan?.Kingdom != null &&
-                        party.Owner.Clan.Kingdom.Name == Hero.MainHero.Clan.Kingdom.Name;
-        }
-
-        public static bool IsOnlyPlayerKingdom(Kingdom kingdom)
-        {
-            return kingdom != null &&
-                        Hero.MainHero?.Clan?.Kingdom != null &&
-                        kingdom == Hero.MainHero?.Clan?.Kingdom;
-        }
-
-        public static bool IsEveryoneExceptPlayer(MobileParty party)
-        {
-            return !IsOnlyPlayer(party);
-        }
-
-        public static bool IsOnlyPlayer(MobileParty party)
-        {
-            return party?.IsMainParty == true;
-        }
-
-        public static bool IsOnlyEnnemies(MobileParty party)
-        {
-            return party != null && !party.IsMainParty && (
-                        party.ActualClan?.Kingdom == null ||
-                        (
-                        Hero.MainHero?.Clan?.Kingdom != null &&
-                        party.ActualClan.Kingdom.Name != Hero.MainHero.Clan.Kingdom.Name
-                        )
-                        );
-        }
-
-        public static bool IsOnlyPlayerClan(MobileParty party)
-        {
-            return party != null && !party.IsMainParty &&
-                        party.ActualClan != null &&
-                        Hero.MainHero?.Clan != null &&
-                        party.ActualClan == Hero.MainHero.Clan;
-        }
-
-        public static bool IsOnlyPlayerKingdom(MobileParty party)
-        {
-            return party != null && !party.IsMainParty &&
-                        party.ActualClan?.Kingdom != null &&
-                        Hero.MainHero?.Clan?.Kingdom != null &&
-                        party.ActualClan.Kingdom.Name == Hero.MainHero.Clan.Kingdom.Name;
-        }
     }
 
-    public enum IScope
+    public enum Scope
     {
         [Description("Everyone (Except player)")]
         Everyone,
 
         [Description("Only player")]
-        Only_player,
+        OnlyPlayer,
 
         [Description("Only player clan")]
-        Only_player_clan,
+        OnlyPlayerClan,
 
         [Description("Only player kingdom")]
-        Only_player_kingdom,
+        OnlyPlayerKingdom,
 
         [Description("Only enemies")]
-        Only_ennemies
+        OnlyEnnemies
     }
 }
