@@ -44,6 +44,9 @@
   <ItemGroup>
     <Folder Include=".github\skills\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Scripts\UpdatePartySizeReunited.bat" />
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!-- Copy dll into obj -->
     <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)\obj\$(ModuleName)\bin\Win64_Shipping_Client\&quot; /C /I /Y /F" />
