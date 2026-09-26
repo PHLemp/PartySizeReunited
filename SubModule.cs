@@ -95,6 +95,7 @@ namespace PartySizeReunited
 
             // Patch WarSails deployment method
             Patch_NavalDLC_ShipDeploymentModel.TryApplyPatch(_harmony);
+            Patch_NavalDLC_ShipLimitModel.TryApplyPatch(_harmony);
             Patch_NavalDLC_PartyWage.TryApplyPatch(_harmony);
             Patch_NavalDLC_PlayerPartyNavalSpeed.TryApplyPatch(_harmony);
 

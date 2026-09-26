@@ -42,6 +42,7 @@ namespace PartySizeReunited.Tests.Tests
             Assert.False(options.IsActivate);
             Assert.False(options.OnlyApplyToPlayer);
             Assert.Equal(0, options.BonusBoats);
+            Assert.Equal(250, options.MaximumIdealShips);
         }
 
         [Fact]

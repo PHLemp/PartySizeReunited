@@ -29,5 +29,6 @@
     <Compile Include="..\McMMenu\Options\WarSailsOptions.cs" Link="McMMenu\Options\WarSailsOptions.cs" />
     <Compile Include="..\Services\PartySizeModelDiscoveryService.cs" Link="Services\PartySizeModelDiscoveryService.cs" />
     <Compile Include="..\HarmonyPatches\Patch_NavalDLC_ShipDeploymentModel.cs" Link="HarmonyPatches\Patch_NavalDLC_ShipDeploymentModel.cs" />
+    <Compile Include="..\HarmonyPatches\Patch_NavalDLC_ShipLimitModel.cs" Link="HarmonyPatches\Patch_NavalDLC_ShipLimitModel.cs" />
   </ItemGroup>
 </Project>
