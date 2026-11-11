@@ -72,7 +72,7 @@ namespace PartySizeReunited.Tests.Tests
 
             var partySize = new PartySize(new List<DefaultPartySizeLimitModel> { new FixedPartySizeLimitModel(BaseLimit) });
 
-            var result = partySize.GetPartyMemberSizeLimit(CreateParty(partyKind, playerClan, playerKingdom));
+            var result = partySize.GetPartyMemberSizeLimit(CreateParty(partyKind, playerClan, playerKingdom), false);
 
             Assert.Equal(expectedLimit, result.ResultNumber);
         }
@@ -95,7 +95,7 @@ namespace PartySizeReunited.Tests.Tests
             };
             var partySize = new PartySize(new List<DefaultPartySizeLimitModel> { new FixedPartySizeLimitModel(BaseLimit) });
 
-            var result = partySize.GetPartyMemberSizeLimit(party);
+            var result = partySize.GetPartyMemberSizeLimit(party, false);
 
             Assert.Equal(15, result.ResultNumber);
         }
@@ -127,7 +127,7 @@ namespace PartySizeReunited.Tests.Tests
                 _limit = limit;
             }
 
-            public override ExplainedNumber GetPartyMemberSizeLimit(PartyBase party, bool includeDescriptions = false)
+            public override ExplainedNumber GetPartyMemberSizeLimit(PartyBase party, bool isCurrentlyAtSea, bool includeDescriptions = false)
             {
                 return new ExplainedNumber(_limit);
             }

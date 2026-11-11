@@ -69,7 +69,7 @@ namespace TaleWorlds.CampaignSystem.GameComponents
 
     public class DefaultPartySizeLimitModel
     {
-        public virtual ExplainedNumber GetPartyMemberSizeLimit(PartyBase party, bool includeDescriptions = false)
+        public virtual ExplainedNumber GetPartyMemberSizeLimit(PartyBase party, bool isCurrentlyAtSea, bool includeDescriptions = false)
         {
             return new ExplainedNumber(0);
         }

@@ -19,16 +19,16 @@ namespace PartySizeReunited
             _partySizeModels = partySizeModels ?? new List<DefaultPartySizeLimitModel>();
         }
 
-        public override ExplainedNumber GetPartyMemberSizeLimit(PartyBase party, bool includeDescriptions = false)
+        public override ExplainedNumber GetPartyMemberSizeLimit(PartyBase party, bool isCurrentlyAtSea, bool includeDescriptions = false)
         {
-            ExplainedNumber partySize = base.GetPartyMemberSizeLimit(party, includeDescriptions);
+            ExplainedNumber partySize = base.GetPartyMemberSizeLimit(party, isCurrentlyAtSea, includeDescriptions);
 
             // Appliquer tous les modèles de taille découverts
             foreach (var model in _partySizeModels)
             {
                 try
                 {
-                    partySize = model.GetPartyMemberSizeLimit(party, includeDescriptions);
+                    partySize = model.GetPartyMemberSizeLimit(party, isCurrentlyAtSea, includeDescriptions);
                 }
                 catch (Exception ex)
                 {
